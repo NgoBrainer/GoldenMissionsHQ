@@ -14,11 +14,12 @@ Scope included:
     - Separate door-frame/opening placeholder objects
     - Separate command dais base and three stair objects: ST-01, ST-02, ST-03
     - Separate camera objects for Camera A, B, C, and D
+    - Canonical Mission Lounge placeholder geometry
 
 Scope intentionally excluded:
-    - Furniture
+    - Finished furniture assets
     - Main Console / Secondary Console
-    - Couches, rug, center table, screens as furniture/detail assets
+    - Finished couches, rug, center table, screens as furniture/detail assets
     - Materials beyond simple architectural placeholders
 
 How to use:
@@ -146,6 +147,7 @@ def setup_scene():
         "doors": make_collection("GMH_Doors_And_Openings"),
         "stairs": make_collection("GMH_Command_Dais_Stairs"),
         "cameras": make_collection("GMH_Cameras"),
+        "furniture": make_collection("GMH_Furniture_Placeholders"),
         "guides": make_collection("GMH_Orientation_Guides"),
     }
 
@@ -156,6 +158,9 @@ def setup_scene():
     create_material("GMH_Door_Frame_Brushed_Metal", (0.46, 0.43, 0.38, 1.0))
     create_material("GMH_Command_Dais_Base", (0.30, 0.29, 0.27, 1.0))
     create_material("GMH_Stair_Surfaces", (0.36, 0.34, 0.31, 1.0))
+    create_material("GMH_Lounge_Couch_Placeholder", (0.32, 0.30, 0.28, 1.0))
+    create_material("GMH_Lounge_Rug_Placeholder", (0.18, 0.24, 0.30, 1.0))
+    create_material("GMH_Lounge_Table_Placeholder", (0.42, 0.34, 0.24, 1.0))
 
     return collections
 
@@ -259,6 +264,45 @@ def build_room_shell(collections):
     add_label_empty("GUIDE_East_Tinkletorium", (half_w + 0.75, 0, 2.5), guides)
 
 
+def build_mission_lounge(collections):
+    """Create CSR placeholder geometry for the Canonical Mission Lounge.
+
+    These are simple editable footprint blocks only. They establish location,
+    rotation, scale, occupied space, and replacement-ready object origins without
+    finished furniture detailing.
+    """
+    furniture = collections["furniture"]
+
+    # Three-couch arrangement leaves the north / Main Screen side open.
+    couch_specs = [
+        ("GMH_Couch_South_Placeholder", (0.0, -2.65, 0.45), (4.8, 0.85, 0.90), 0.0),
+        ("GMH_Couch_West_Placeholder", (-3.05, 0.0, 0.45), (3.6, 0.85, 0.90), math.radians(90)),
+        ("GMH_Couch_East_Placeholder", (3.05, 0.0, 0.45), (3.6, 0.85, 0.90), math.radians(90)),
+    ]
+
+    for name, loc, scale, rot_z in couch_specs:
+        obj = cube_obj(name, loc, scale, "GMH_Lounge_Couch_Placeholder", furniture)
+        obj.rotation_euler[2] = rot_z
+
+    # Low, thin footprint marker for the approved Mission Lounge rug.
+    cube_obj(
+        "GMH_MissionLounge_Rug",
+        location=(0.0, 0.0, 0.015),
+        scale=(5.6, 4.3, 0.03),
+        mat_name="GMH_Lounge_Rug_Placeholder",
+        collection=furniture,
+    )
+
+    # Simple center block defining the coffee table replacement volume.
+    cube_obj(
+        "GMH_MissionLounge_CoffeeTable",
+        location=(0.0, 0.0, 0.32),
+        scale=(2.2, 1.2, 0.38),
+        mat_name="GMH_Lounge_Table_Placeholder",
+        collection=furniture,
+    )
+
+
 def create_cameras(collections):
     cam_collection = collections["cameras"]
     camera_specs = [
@@ -299,6 +343,7 @@ def set_view_settings():
 def main():
     collections = setup_scene()
     build_room_shell(collections)
+    build_mission_lounge(collections)
     create_cameras(collections)
     add_lighting()
     set_view_settings()
@@ -309,7 +354,7 @@ def main():
     bpy.ops.object.select_all(action="DESELECT")
 
     print("Golden Missions Headquarters room shell generated successfully.")
-    print("Furniture and consoles intentionally excluded from this room-shell pass.")
+    print("Finished furniture and consoles intentionally excluded from this room-shell pass.")
 
 
 if __name__ == "__main__":
