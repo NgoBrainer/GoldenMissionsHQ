@@ -275,9 +275,9 @@ def build_mission_lounge(collections):
 
     # Three-couch arrangement leaves the north / Main Screen side open.
     couch_specs = [
-        ("GMH_Couch_South_Placeholder", (0.0, -2.65, 0.45), (4.8, 0.85, 0.90), 0.0),
-        ("GMH_Couch_West_Placeholder", (-3.05, 0.0, 0.45), (3.6, 0.85, 0.90), math.radians(90)),
-        ("GMH_Couch_East_Placeholder", (3.05, 0.0, 0.45), (3.6, 0.85, 0.90), math.radians(90)),
+        ("GMH_Couch_South_Placeholder", (0.0, -1.45, 0.45), (4.8, 0.85, 0.90), 0.0),
+        ("GMH_Couch_West_Placeholder", (-3.05, 1.2, 0.45), (3.6, 0.85, 0.90), math.radians(90)),
+        ("GMH_Couch_East_Placeholder", (3.05, 1.2, 0.45), (3.6, 0.85, 0.90), math.radians(90)),
     ]
 
     for name, loc, scale, rot_z in couch_specs:
@@ -287,7 +287,7 @@ def build_mission_lounge(collections):
     # Low, thin footprint marker for the approved Mission Lounge rug.
     cube_obj(
         "GMH_MissionLounge_Rug",
-        location=(0.0, 0.0, 0.015),
+        location=(0.0, 1.2, 0.015),
         scale=(5.6, 4.3, 0.03),
         mat_name="GMH_Lounge_Rug_Placeholder",
         collection=furniture,
@@ -296,7 +296,7 @@ def build_mission_lounge(collections):
     # Simple center block defining the coffee table replacement volume.
     cube_obj(
         "GMH_MissionLounge_CoffeeTable",
-        location=(0.0, 0.0, 0.32),
+        location=(0.0, 1.2, 0.32),
         scale=(2.2, 1.2, 0.38),
         mat_name="GMH_Lounge_Table_Placeholder",
         collection=furniture,
