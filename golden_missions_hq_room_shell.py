@@ -53,6 +53,13 @@ CORNER_CUT = 3.0           # chamfered/curved-room corner approximation
 
 MATERIALS = {}
 
+CANONICAL_CAMERA_NAMES = (
+    "GMH_Camera_A_CommandDais_South_Facing_North",
+    "GMH_Camera_B_Elevator_Threshold_Facing_Room",
+    "GMH_Camera_C_MainScreen_Facing_CommandDais",
+    "GMH_Camera_D_Tinkletorium_Threshold_Facing_West",
+)
+
 
 # -----------------------------------------------------------------------------
 # Utility functions
@@ -321,6 +328,70 @@ def create_cameras(collections):
         cam_collection.objects.link(cam_obj)
 
     bpy.context.scene.camera = bpy.data.objects["GMH_Camera_B_Elevator_Threshold_Facing_Room"]
+
+
+def validate_canonical_camera(camera_name, render=False, frame_view=False):
+    """Set a canonical GMH camera active for validation/navigation only.
+
+    This helper intentionally does not move cameras, edit lenses, change targets,
+    or touch Headquarters / Mission Lounge geometry. It exists so Chromebook and
+    Linux users can validate the four canonical views without numpad shortcuts.
+
+    Args:
+        camera_name: Exact canonical camera object name, or a single-letter alias
+            ("A", "B", "C", or "D").
+        render: When True, render one still image from the selected camera.
+        frame_view: When True, attempt to switch available 3D Viewports into
+            camera view. If Blender has no suitable viewport context, the helper
+            safely prints manual validation instructions instead.
+
+    Returns:
+        The active camera object.
+    """
+    aliases = {name.split("_Camera_")[1][0]: name for name in CANONICAL_CAMERA_NAMES}
+    requested_name = aliases.get(str(camera_name).upper(), camera_name)
+
+    if requested_name not in CANONICAL_CAMERA_NAMES:
+        valid = ", ".join(CANONICAL_CAMERA_NAMES)
+        raise ValueError(f"Unknown GMH canonical camera '{camera_name}'. Valid cameras: {valid}")
+
+    cam_obj = bpy.data.objects.get(requested_name)
+    if cam_obj is None or cam_obj.type != "CAMERA":
+        raise RuntimeError(
+            f"Canonical camera '{requested_name}' was not found. "
+            "Run main() first, or generate the GMH room shell before validation."
+        )
+
+    # Validation/navigation only: preserve every camera transform and all geometry.
+    bpy.context.scene.camera = cam_obj
+    print(f"GMH validation camera active: {requested_name}")
+    print(
+        "Manual viewport check: press 0 / use View > Cameras > Active Camera "
+        "if viewport switching is unavailable."
+    )
+
+    if frame_view:
+        switched = False
+        for area in bpy.context.screen.areas if bpy.context.screen else []:
+            if area.type != "VIEW_3D":
+                continue
+            region = next((r for r in area.regions if r.type == "WINDOW"), None)
+            space = next((s for s in area.spaces if s.type == "VIEW_3D"), None)
+            if region is None or space is None:
+                continue
+            with bpy.context.temp_override(area=area, region=region, space_data=space):
+                bpy.ops.view3d.view_camera()
+                switched = True
+        if switched:
+            print(f"Viewport switched to active camera: {requested_name}")
+        else:
+            print(f"No 3D viewport context found; active scene camera is still: {requested_name}")
+
+    if render:
+        print(f"Rendering still from active GMH validation camera: {requested_name}")
+        bpy.ops.render.render(write_still=True)
+
+    return cam_obj
 
 
 def add_lighting():
