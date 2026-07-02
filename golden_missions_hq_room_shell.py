@@ -314,7 +314,7 @@ def create_cameras(collections):
     cam_collection = collections["cameras"]
     camera_specs = [
         ("GMH_Camera_A_CommandDais_South_Facing_North", (0, -7.65, 2.67), (0, 8.0, 2.67), 35),
-        ("GMH_Camera_B_Elevator_Threshold_Facing_Room", (-10.8, -4.8, 1.7), (1.5, 1.0, 1.8), 32),
+        ("GMH_Camera_B_Elevator_Threshold_Facing_Room", (-10.65, -4.8, 1.8), (11.0, -4.8, 1.8), 32),
         ("GMH_Camera_C_MainScreen_Facing_CommandDais", (0, 10.8, 2.4), (4.8, -5.3, 1.8), 35),
         ("GMH_Camera_D_Tinkletorium_Threshold_Facing_West", (12.2, 2.3, 1.8), (0, 0, 1.8), 32),
     ]
